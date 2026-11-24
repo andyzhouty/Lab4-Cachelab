@@ -58,8 +58,54 @@ static void usage(const char *prog)
  */
 static void access_cache(uint64_t addr)
 {
-    (void)addr;
-    (void)tick;
+    uint64_t set_index = 0, tag = 0;
+    if (s != 0) {
+        set_index = (addr >> b) & ((1ULL << s) - 1);
+    }
+    if (s + b != 64) {
+        tag = addr >> (s + b);
+    }
+    tick++;
+    line_t *empty_line = NULL;
+
+    size_t base = (size_t)(set_index) * (size_t)E;
+    for (int j = 0; j < E; j++) {
+        line_t *line = &cache[base+j];
+        if (line->valid && line->tag == tag) {
+            hits++;
+            line->last_used = tick;
+            if (verbose) printf(" hit");
+            return;
+        }
+        if (!line->valid && empty_line == NULL) {
+            empty_line = line;
+        }
+    }
+
+    // miss / miss eviction
+    misses++;
+    // miss
+    if (empty_line != NULL) {
+        empty_line->valid = 1;
+        empty_line->tag = tag;
+        empty_line->last_used = tick;
+        if (verbose) printf(" miss");
+        return;
+    }
+
+    // miss eviction
+    evictions++;
+    line_t *target = &cache[base]; // 找到带有最小 last_used 的目标 line
+    line_t *current_line;
+    for (int j = 0; j < E; j++) {
+        current_line = &cache[base+j];
+        if (current_line->last_used < target->last_used) {
+            target = current_line;
+        }
+    }
+    target->tag = tag;
+    target->last_used = tick;
+    if (verbose) printf(" miss eviction");
 }
 
 /* replay - run every data access in the trace through the cache */

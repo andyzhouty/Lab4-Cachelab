@@ -16,3 +16,4 @@ trace.tmp
 .marker
 __pycache__/
 *.dSYM
+artifacts/*.md
