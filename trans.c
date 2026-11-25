@@ -132,9 +132,9 @@ void registerFunctions()
     registerTransFunction(transpose_submit, transpose_submit_desc);
 
     /* Register any additional transpose functions */
-    registerTransFunction(trans, trans_desc);
-    registerTransFunction(transpose_block_8, transpose_block_8_desc);
-    registerTransFunction(transpose_block_8_optimized, transpose_block_8_optimized_desc);
+    // registerTransFunction(trans, trans_desc);
+    // registerTransFunction(transpose_block_8, transpose_block_8_desc);
+    // registerTransFunction(transpose_block_8_optimized, transpose_block_8_optimized_desc);
 }
 
 /*
